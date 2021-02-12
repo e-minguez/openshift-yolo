@@ -1,0 +1,40 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: yolo
+  namespace: openshift-cluster-version
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          affinity: {}
+          containers:
+          - name: yolo
+            command:
+              - /bin/bash
+              - -c
+              - |
+                #/bin/bash
+                die(){
+                	echo "${1}"
+                	exit "${2}"
+                }
+                if [ $(oc get clusterversion/version -o jsonpath='{.status.availableUpdates}') != '<nil>' ]; then
+                	oc adm upgrade --to-latest || die "Cannot update to latest" 1
+                else
+                	die "No upgrade available" 0
+                fi
+            image: registry.redhat.io/openshift4/ose-cli:latest
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 30
+  schedule: "53 * * * *"
+  successfulJobsHistoryLimit: 3
+  suspend: false
