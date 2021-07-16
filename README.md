@@ -7,5 +7,5 @@ By default it is scheduled every hour at 53 minutes, but you can break your
 cluster whenever you want :)
 
 ```bash
-oc apply -f yolo.yaml
+oc apply -f https://raw.githubusercontent.com/e-minguez/openshift-yolo/main/yolo.yaml
 ```
